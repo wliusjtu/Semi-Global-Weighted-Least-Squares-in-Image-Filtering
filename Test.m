@@ -6,7 +6,7 @@ lambda = 900;
 sigmaR = 2;
 r = 1;
 sigmaS = r;
-step = r;
+step = r + 1;
 iterNum = 2;
 weightChoice = 1;  % 0 for exponential weight and 1 for fractional weight
 
