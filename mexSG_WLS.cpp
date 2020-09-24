@@ -150,162 +150,74 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int col, row, iter;
     
     // do filtering
-    if(r == 1)  // radius is 1
+    clock_t tStart = clock(); // time measurement;
+
+    for(iter=0; iter<iterNum; iter++)
     {
-        clock_t tStart = clock(); // time measurement;
-        
-        for(iter=0; iter<iterNum; iter++)
+        /////////////// column direction //////////////
+        valueSet2(count, 0.0);
+        valueSet3(imgInter, 0.0, chaNumImg);
+
+        for(col=r; col<maxIterColNum; col+=step)
         {
-            /////////////// column direction //////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(col=r; col<maxIterColNum; col+=step)
-            {
-                img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-                getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
+            img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
+            getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
+            if(r==1)
                 solverForRadius1(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
-                vector2img_col(imgInter, vectorFiltered_col, count, col);
-            }
-            
-            // the last 2 * r + 1 columns
-            col = colNum - 1 - r;
-            img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-            getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
-            solverForRadius1(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
-            vector2img_col(imgInter, vectorFiltered_col, count, col);
-            
-            pointDiv(imgInter, imgFiltered, count);
-            
-            ///////////////////// row direction //////////////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(row=r; row<maxIterRowNum; row+=step)
-            {
-                img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
-                getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-                solverForRadius1(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
-                vector2img_row(imgInter, vectorFiltered_row, count, row);
-            }
-            
-            // the last 2 * r + 1 rows
-            row = rowNum - 1 - r;
-            img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
-            getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-            solverForRadius1(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
-            vector2img_row(imgInter, vectorFiltered_row, count, row);
-            
-            pointDiv(imgInter, imgFiltered, count);
-        }
-        
-        mexPrintf("Elapsed time is %f seconds.\n", double(clock() - tStart)/CLOCKS_PER_SEC);
-    }
-    //////////////////////////////
-    else if(r == 2)  // radius is 2
-    {
-        clock_t tStart = clock(); // time measurement;
-        
-        for(iter=0; iter<iterNum; iter++)
-        {
-            /////////////// column direction //////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(col=r; col<maxIterColNum; col+=step)
-            {
-                img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-                getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
+            else if(r==2)
                 solverForRadius2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
-                vector2img_col(imgInter, vectorFiltered_col, count, col);
-            }
-            
-            // the last 2 * r + 1 columns
-            col = colNum - 1 - r;
-            img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-            getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
-            solverForRadius2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
-            vector2img_col(imgInter, vectorFiltered_col, count, col);
-            
-            pointDiv(imgInter, imgFiltered, count);
-            
-            ///////////////////// row direction //////////////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(row=r; row<maxIterRowNum; row+=step)
-            {
-                img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
-                getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-                solverForRadius2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
-                vector2img_row(imgInter, vectorFiltered_row, count, row);
-            }
-            
-            // the last 2 * r + 1 rows
-            row = rowNum - 1 - r;
-            img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
-            getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-            solverForRadius2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
-            vector2img_row(imgInter, vectorFiltered_row, count, row);
-            
-            pointDiv(imgInter, imgFiltered, count);  
-        }
-        
-        mexPrintf("Elapsed time is %f seconds.\n", double(clock() - tStart)/CLOCKS_PER_SEC);
-        
-    }
-    ///////////////////////////////
-    else  // radius larger than 2
-    {
-        clock_t tStart = clock(); // time measurement;
-        
-        for(iter=0; iter<iterNum; iter++)
-        {
-            /////////////// column direction //////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(col=r; col<maxIterColNum; col+=step)
-            {
-                img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-                getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
+            else
                 solverForRadiusLargerThan2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
-                vector2img_col(imgInter, vectorFiltered_col, count, col);
-            }
-            
-            // the last 2 * r + 1 columns
-            col = colNum - 1 - r;
-            img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
-            getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
-            solverForRadiusLargerThan2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
             vector2img_col(imgInter, vectorFiltered_col, count, col);
-            
-            pointDiv(imgInter, imgFiltered, count);
-            
-            ///////////////////// row direction //////////////////////
-            valueSet2(count, 0.0);
-            valueSet3(imgInter, 0.0, chaNumImg);
-            
-            for(row=r; row<maxIterRowNum; row+=step)
-            {
-                img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
-                getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-                solverForRadiusLargerThan2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
-                vector2img_row(imgInter, vectorFiltered_row, count, row);
-            }
-            
-            // the last 2 * r + 1 rows
-            row = rowNum - 1 - r;
+        }
+
+        // the last 2 * r + 1 columns
+        col = colNum - 1 - r;
+        img2vector_col(imgFiltered, imgGuide, vectorImg_col, vectorGuide_col, col);
+        getLaplacian(vectorGuide_col, a_col, b_col, c_col, lambda, rangeLUT, spatialLUT, sysLen_col);
+        if(r==1)
+            solverForRadius1(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
+        else if(r==2)
+            solverForRadius2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
+        else
+            solverForRadiusLargerThan2(a_col, b_col, c_col, alpha_col, gamma_col, beta_col, vectorImg_col, vectorInter_col, vectorFiltered_col, sysLen_col);
+        vector2img_col(imgInter, vectorFiltered_col, count, col);
+
+        pointDiv(imgInter, imgFiltered, count);
+
+        ///////////////////// row direction //////////////////////
+        valueSet2(count, 0.0);
+        valueSet3(imgInter, 0.0, chaNumImg);
+
+        for(row=r; row<maxIterRowNum; row+=step)
+        {
             img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
             getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
-            solverForRadiusLargerThan2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+            if(r==1)
+                solverForRadius1(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+            else if(r==2)
+                solverForRadius2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+            else
+                solverForRadiusLargerThan2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
             vector2img_row(imgInter, vectorFiltered_row, count, row);
-            
-            pointDiv(imgInter, imgFiltered, count);  
         }
-        
-        mexPrintf("Elapsed time is %f seconds.\n", double(clock() - tStart)/CLOCKS_PER_SEC);
+
+        // the last 2 * r + 1 rows
+        row = rowNum - 1 - r;
+        img2vector_row(imgFiltered, imgGuide, vectorImg_row, vectorGuide_row, row);
+        getLaplacian(vectorGuide_row, a_row, b_row, c_row, lambda, rangeLUT, spatialLUT, sysLen_row);
+        if(r==1)
+            solverForRadius1(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+        else if(r==2)
+            solverForRadius2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+        else
+            solverForRadiusLargerThan2(a_row, b_row, c_row, alpha_row, gamma_row, beta_row, vectorImg_row, vectorInter_row, vectorFiltered_row, sysLen_row);
+        vector2img_row(imgInter, vectorFiltered_row, count, row);
+
+        pointDiv(imgInter, imgFiltered, count);
     }
+
+    mexPrintf("Elapsed time is %f seconds.\n", double(clock() - tStart)/CLOCKS_PER_SEC);
     
     // transfer to the output
     for(int i=0; i<rowNum; i++)
