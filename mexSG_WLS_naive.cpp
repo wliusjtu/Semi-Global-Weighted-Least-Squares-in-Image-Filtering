@@ -228,6 +228,30 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 imgResult[k * rc + j * rowNum + i] = imgFiltered[i][j][k];
         }
     }
+    
+    memFreeDouble3(imgFiltered);
+    memFreeDouble3(imgGuide);
+    memFreeDouble3(imgInter);
+    a_row = NULL;
+    a_col = NULL;
+    memFreeDouble2(b_row);
+    memFreeDouble2(b_col);
+    memFreeDouble2(c_row);
+    memFreeDouble2(c_col);
+    alpha_row = NULL;
+    alpha_col = NULL;
+    memFreeDouble2(beta_row);
+    memFreeDouble2(beta_col);
+    memFreeDouble2(gamma_row);
+    memFreeDouble2(gamma_col);
+    memFreeDouble2(vectorImg_row);
+    memFreeDouble2(vectorImg_col);
+    memFreeDouble2(vectorGuide_row);
+    memFreeDouble2(vectorGuide_col);
+    memFreeDouble2(vectorFiltered_row);
+    memFreeDouble2(vectorFiltered_col);
+    memFreeDouble2(vectorInter_row);
+    memFreeDouble2(vectorInter_col);
 
 }
 
