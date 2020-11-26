@@ -33,4 +33,11 @@ if max(img_g(:)) <= 1.0
     error('guidance image should be in range [0, 255].\n');
 end
 
-result = mexSG_WLS(img, img_g, lambda, sigmaR, sigmaS, r, step, iterNum, weightChoice);
+% % naive implementation, more time consuming
+% result = mexSG_WLS_naive(img, img_g, lambda, sigmaR, sigmaS, r, step, iterNum, weightChoice);
+
+% optimized code, code-level optimization, produce the same results, but
+% faster
+result = mexSG_WLS_opt(img, img_g, lambda, sigmaR, sigmaS, r, step, iterNum, weightChoice);
+
+
